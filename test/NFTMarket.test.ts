@@ -30,6 +30,7 @@ describe('NFTMarket', () => {
     await nft.deployed()
 
     await nft.mint(await seller.getAddress(), 1)
+    await nft.connect(seller).approve(nftMarket.address, 1)
   })
 
   describe('#list', () => {
@@ -67,6 +68,9 @@ describe('NFTMarket', () => {
       await nft.mint(await seller.getAddress(), 2)
       await nft.mint(await seller.getAddress(), 3)
       await nft.mint(await seller.getAddress(), 4)
+      await nft.connect(seller).approve(nftMarket.address, 2)
+      await nft.connect(seller).approve(nftMarket.address, 3)
+      await nft.connect(seller).approve(nftMarket.address, 4)
       await nftMarket.connect(seller).list(nft.address, 1, ONE_ETH)
       await nftMarket.connect(seller).list(nft.address, 2, ONE_ETH.div(4))
       await nftMarket.connect(seller).list(nft.address, 3, ONE_ETH.div(3))
