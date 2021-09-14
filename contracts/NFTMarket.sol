@@ -86,6 +86,41 @@ contract NFTMarket {
         return listedNfts[_nftAddress];
     }
 
+    function _addListedNft(address _nftAddress) internal {
+        // https://ethereum.stackexchange.com/questions/27510/solidity-list-contains/27518
+        if (!listedNfts[_nftAddress].active) {
+            listedNfts[_nftAddress].active = true;
+            listedNftsArray.push(_nftAddress);
+        }
+    }
+
+    function _purchase(address _nftAddress, uint256 _tokenID) internal {
+        require(msg.value == listedNfts[_nftAddress].tokens[_tokenID].price);
+        ERC721 nftContract = ERC721(_nftAddress);
+        address owner = listedNfts[_nftAddress].tokens[_tokenID].owner;
+        _delist(_nftAddress, _tokenID);
+        nftContract.safeTransferFrom(address(this), msg.sender, _tokenID);
+        (bool success,) = owner.call{value: msg.value}("");
+        require(success, "Failed to send ether");
+    }
+
+    function _delist(address _nftAddress, uint256 _tokenID) internal {
+        uint256 price = listedNfts[_nftAddress].tokens[_tokenID].price;
+        delete listedNfts[_nftAddress].tokens[_tokenID];
+        removeTokensArrayItem(_nftAddress, _tokenID);
+        if (listedNfts[_nftAddress].floorPrice == price) {
+            for (uint i=0; i < listedNfts[_nftAddress].floorTokens.length; i++) {
+                if (listedNfts[_nftAddress].floorTokens[i] == _tokenID) {
+                    listedNfts[_nftAddress].floorTokens = _removeArrayItem(i, listedNfts[_nftAddress].floorTokens);
+                }
+            }
+            if (listedNfts[_nftAddress].floorTokens.length == 0) {
+                listedNfts[_nftAddress].floorPrice = 0;
+                buildFloor(_nftAddress);
+            }
+        }
+    }
+
     /// List an NFT for sale.
     /// @param _nftAddress the address of the NFT contract
     /// @param _tokenID the token ID for the NFT being sold
