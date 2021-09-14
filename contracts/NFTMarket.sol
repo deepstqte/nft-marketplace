@@ -49,6 +49,23 @@ contract NFTMarket {
         }
     }
 
+    function _removeArrayItem(uint256 _index, uint256[] storage _array) internal returns (uint256[] memory) {
+        if (_index >= _array.length) return _array;
+        if (_array.length > 1) {
+            for (uint256 i = _index; i<_array.length-1; i++){
+                _array[i] = _array[i+1];
+            }
+        }
+        delete _array[_array.length-1];
+        _array.pop();
+        return _array;
+    }
+
+    function removeTokensArrayItem(address _nftAddress, uint256 _tokenID) internal {
+        listedNfts[_nftAddress].tokensArray = _removeArrayItem(listedNfts[_nftAddress].indexOfToken[_tokenID], listedNfts[_nftAddress].tokensArray);
+        delete listedNfts[_nftAddress].indexOfToken[_tokenID];
+    }
+
     /// List an NFT for sale.
     /// @param _nftAddress the address of the NFT contract
     /// @param _tokenID the token ID for the NFT being sold
