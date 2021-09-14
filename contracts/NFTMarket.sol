@@ -166,7 +166,8 @@ contract NFTMarket {
 
     /// Purchase the cheapest NFT in a specified collection.
     /// @param _nftAddress the address of the NFT contract
-    function buyFloor(address _nftAddress) public payable {
-        // TODO: Implement this function!
+    function buyFloor(address _nftAddress) external payable {
+        require(listedNfts[_nftAddress].floorTokens.length > 0);
+        _purchase(_nftAddress, listedNfts[_nftAddress].floorTokens[0]);
     }
 }
