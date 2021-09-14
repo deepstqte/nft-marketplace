@@ -66,6 +66,26 @@ contract NFTMarket {
         delete listedNfts[_nftAddress].indexOfToken[_tokenID];
     }
 
+    function getAllListedNfts() public view returns (address[] memory) {
+        return listedNftsArray;
+    }
+
+    function getNftListedTokens(address _nftAddress) external view returns (uint256[] memory) {
+        return listedNfts[_nftAddress].tokensArray;
+    }
+
+    function getNftListedFloorTokens(address _nftAddress) external view returns (uint256[] memory) {
+        return listedNfts[_nftAddress].floorTokens;
+    }
+
+    function getNftTokenInfo(address _nftAddress, uint256 _tokenID) external view returns (listedNftToken memory) {
+        return listedNfts[_nftAddress].tokens[_tokenID];
+    }
+
+    function getNftListings(address _nftAddress) internal view returns (listedNft storage) {
+        return listedNfts[_nftAddress];
+    }
+
     /// List an NFT for sale.
     /// @param _nftAddress the address of the NFT contract
     /// @param _tokenID the token ID for the NFT being sold
