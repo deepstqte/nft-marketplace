@@ -106,8 +106,10 @@ describe('NFTMarket', () => {
     })
 
     it('should purchase the floor NFT', async () => {
-      await nftMarket.connect(buyer).buyFloor(nft.address)
-      await nftMarket.connect(buyer).buyFloor(nft.address)
+      const firstFloor = await nftMarket.getFloorPrice(nft.address)
+      await nftMarket.connect(buyer).buyFloor(nft.address, {value: firstFloor})
+      const secondFloor = await nftMarket.getFloorPrice(nft.address)
+      await nftMarket.connect(buyer).buyFloor(nft.address, {value: secondFloor})
 
       expect(await nft.ownerOf(2)).to.eq(await buyer.getAddress())
       expect(await nft.ownerOf(3)).to.eq(await buyer.getAddress())
