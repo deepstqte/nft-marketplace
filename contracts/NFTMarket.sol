@@ -132,8 +132,21 @@ contract NFTMarket {
     /// @param _nftAddress the address of the NFT contract
     /// @param _tokenID the token ID for the NFT being sold
     /// @param _amount the amount in wei to sell the NFT for
-    function list(address _nftAddress, uint256 _tokenID, uint256 _amount) public {
-        // TODO: Implement this function!
+    function list(address _nftAddress, uint256 _tokenID, uint256 _amount) external {
+        ERC721 nftContract = ERC721(_nftAddress);
+        _addListedNft(_nftAddress);
+        if (listedNfts[_nftAddress].floorPrice == 0 || _amount < listedNfts[_nftAddress].floorPrice) {
+            listedNfts[_nftAddress].floorPrice = _amount;
+            delete listedNfts[_nftAddress].floorTokens;
+            listedNfts[_nftAddress].floorTokens.push(_tokenID);
+        } else if (_amount == listedNfts[_nftAddress].floorPrice) {
+            listedNfts[_nftAddress].floorTokens.push(_tokenID);
+        }
+        listedNfts[_nftAddress].indexOfToken[_tokenID] = listedNfts[_nftAddress].tokensArray.length;
+        listedNfts[_nftAddress].tokensArray.push(_tokenID);
+        listedNfts[_nftAddress].tokens[_tokenID].owner = msg.sender;
+        listedNfts[_nftAddress].tokens[_tokenID].price = _amount;
+        nftContract.transferFrom(msg.sender, address(this), _tokenID);
     }
 
     /// Purchase a specified NFT
