@@ -25,6 +25,30 @@ contract NFTMarket {
     mapping(address => listedNft) private listedNfts;
     address[] private listedNftsArray;
 
+    // This function can be very costly to execute depending on the size of the NFT listing
+    // This means it wouldn't scale well so the goal is to keep its usage to a minimum
+    // and to find a more efficient approach
+    function buildFloor(address _nftAddress) internal {
+        if (listedNfts[_nftAddress].tokensArray.length > 1) {
+            for (uint256 i = 0; i<listedNfts[_nftAddress].tokensArray.length-1; i++){
+                if (listedNfts[_nftAddress].floorPrice == 0 || listedNfts[_nftAddress].tokens[listedNfts[_nftAddress].tokensArray[i]].price < listedNfts[_nftAddress].floorPrice) {
+                    listedNfts[_nftAddress].floorPrice = listedNfts[_nftAddress].tokens[listedNfts[_nftAddress].tokensArray[i]].price;
+                    delete listedNfts[_nftAddress].floorTokens;
+                    listedNfts[_nftAddress].floorTokens.push(listedNfts[_nftAddress].tokensArray[i]);
+                } else if (listedNfts[_nftAddress].tokens[listedNfts[_nftAddress].tokensArray[i]].price == listedNfts[_nftAddress].floorPrice) {
+                    listedNfts[_nftAddress].floorTokens.push(listedNfts[_nftAddress].tokensArray[i]);
+                }
+            }
+        } else if (listedNfts[_nftAddress].tokensArray.length == 1) {
+            delete listedNfts[_nftAddress].floorTokens;
+            listedNfts[_nftAddress].floorTokens = listedNfts[_nftAddress].tokensArray;
+            listedNfts[_nftAddress].floorPrice = listedNfts[_nftAddress].tokens[listedNfts[_nftAddress].tokensArray[0]].price;
+        } else {
+            delete listedNfts[_nftAddress].floorTokens;
+            listedNfts[_nftAddress].floorPrice = 0;
+        }
+    }
+
     /// List an NFT for sale.
     /// @param _nftAddress the address of the NFT contract
     /// @param _tokenID the token ID for the NFT being sold
