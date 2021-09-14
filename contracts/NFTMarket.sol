@@ -152,8 +152,10 @@ contract NFTMarket {
     /// Purchase a specified NFT
     /// @param _nftAddress the address of the NFT contract
     /// @param _tokenID the token ID for the NFT being sold
-    function purchase(address _nftAddress, uint256 _tokenID) public payable {
-        // TODO: Implement this function!
+    function purchase(address _nftAddress, uint256 _tokenID) external payable {
+        // This will guarantee the owner is not 0x0 and therefore the token is listed
+        require(listedNfts[_nftAddress].tokens[_tokenID].owner != address(0));
+        _purchase(_nftAddress, _tokenID);
     }
 
     /// Return the lowest listed NFT for sale in a given collection
