@@ -121,6 +121,13 @@ contract NFTMarket {
         }
     }
 
+    function delist(address _nftAddress, uint256 _tokenID) external {
+        require(msg.sender == listedNfts[_nftAddress].tokens[_tokenID].owner);
+        ERC721 nftContract = ERC721(_nftAddress);
+        _delist(_nftAddress, _tokenID);
+        nftContract.safeTransferFrom(address(this), msg.sender, _tokenID);
+    }
+
     /// List an NFT for sale.
     /// @param _nftAddress the address of the NFT contract
     /// @param _tokenID the token ID for the NFT being sold
