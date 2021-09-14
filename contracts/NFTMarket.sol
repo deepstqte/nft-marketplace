@@ -2,9 +2,28 @@
 
 pragma solidity ^0.8.5;
 
-/// @author tbtstl
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+
+/// @author tbtstl & gzork
 /// @title A Simple NFT Market
 contract NFTMarket {
+
+    struct listedNftToken {
+        address owner;
+        uint256 price;
+    }
+
+    struct listedNft {
+        mapping(uint256 => listedNftToken) tokens;
+        mapping(uint256 => uint256) indexOfToken;
+        uint256[] tokensArray;
+        uint256[] floorTokens;
+        uint256 floorPrice;
+        bool active;
+    }
+
+    mapping(address => listedNft) private listedNfts;
+    address[] private listedNftsArray;
 
     /// List an NFT for sale.
     /// @param _nftAddress the address of the NFT contract
